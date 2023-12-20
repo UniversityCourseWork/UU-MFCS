@@ -31,15 +31,17 @@ def perform_tests():
     X0 = 1.0
     mu = 0.3
     sigma = 0.1
-    n_steps = 100
-    delta_T = np.arange(0.1, 5, 0.1)
-    T_max = delta_T * n_steps
+    delta_T = np.arange(0.1, 2.0, 0.1)
+    #n_steps = 100
+    #T_max = delta_T * n_steps
+    T_max = 50.0
+    n_steps =  T_max * np.reciprocal(delta_T)
 
     # Generate all paths
-    gbm_paths = [Geometric_Brownian_Motion(mu = mu, sigma = sigma, dt=dt, n_steps = n_steps, X0 = X0).generate_path(seed=32) for dt in delta_T]
+    gbm_paths = [Geometric_Brownian_Motion(mu = mu, sigma = sigma, dt=dt, n_steps = int(steps), X0 = X0).generate_path(seed=32) for (dt, steps) in zip(delta_T, n_steps)]
 
     # Compute MLE estimate for each path
-    x_hats = [mle_estimator(path, T) for path, T in zip(gbm_paths, T_max)]
+    x_hats = [mle_estimator(path, T_max) for path in gbm_paths]
     errors_mu = [abs(est_mu-mu) for est_mu, _ in x_hats]
     errors_sigma = [abs(est_sigma-sigma) for _, est_sigma in x_hats]
     
@@ -60,7 +62,7 @@ def perform_tests():
     X0 = 1.0
     mu = 0.3
     sigma = 0.1
-    n_steps = np.arange(100, 10_000, 500)
+    n_steps = np.array([10, 50, 100, 250, 500, 750, 1000]) #np.arange(10, 1_000, 50)
     delta_T = 0.1
     T_max = delta_T * n_steps
 
